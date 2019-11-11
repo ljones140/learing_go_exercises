@@ -6,14 +6,6 @@ import (
 	"testing"
 )
 
-type SpySleeper struct {
-	Calls int
-}
-
-func (s *SpySleeper) Sleep() {
-	s.Calls++
-}
-
 type CountdownOperationSpy struct {
 	Calls []string
 }
@@ -33,9 +25,8 @@ const sleep = "sleep"
 func TestCountdown(t *testing.T) {
 	t.Run("prints 3 to Go!", func(t *testing.T) {
 		buffer := &bytes.Buffer{}
-		spySleeper := &SpySleeper{}
+		Countdown(buffer, &CountdownOperationSpy{})
 
-		Countdown(buffer, spySleeper)
 		got := buffer.String()
 		want := `3
 2
