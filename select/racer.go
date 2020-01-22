@@ -1,17 +1,27 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"time"
 )
 
-func Racer(url_a, url_b string) (winner string) {
+var tenSecondTimeout = 10 * time.Second
+
+func Racer(urlA, urlB string) (winner string, error error) {
+	return ConfigurableRacer(urlA, urlB, tenSecondTimeout)
+}
+
+func ConfigurableRacer(urlA, urlB string, timeout time.Duration) (winner string, error error) {
 	// select waits on multiple channels
 	// here first to return is returned by the select
 	select {
-	case <-ping(url_a):
-		return url_a
-	case <-ping(url_b):
-		return url_b
+	case <-ping(urlA):
+		return urlA, nil
+	case <-ping(urlB):
+		return urlB, nil
+	case <-time.After(timeout):
+		return "", fmt.Errorf("timed out waiting for %s and %s", urlA, urlB)
 	}
 }
 
