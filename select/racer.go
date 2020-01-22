@@ -2,19 +2,26 @@ package main
 
 import (
 	"net/http"
-	"time"
 )
 
 func Racer(url_a, url_b string) (winner string) {
-	if duration(url_a) < duration(url_b) {
+	// select waits on multiple channels
+	// here first to return is returned by the select
+	select {
+	case <-ping(url_a):
 		return url_a
+	case <-ping(url_b):
+		return url_b
 	}
-
-	return url_b
 }
 
-func duration(url string) time.Duration {
-	start := time.Now()
-	http.Get(url)
-	return time.Since(start)
+func ping(url string) chan struct{} {
+	// Always use `make` when creating a channel as just initalising a variable
+	// will give the "zero" value of the type
+	ch := make(chan struct{})
+	go func() {
+		http.Get(url)
+		close(ch)
+	}()
+	return ch
 }
